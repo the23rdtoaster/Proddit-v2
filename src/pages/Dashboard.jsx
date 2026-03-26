@@ -3,6 +3,7 @@ import { useApp } from '../context/AppContext';
 import { getSquadQuest } from '../services/squadService';
 import { getTodayCheckIn } from '../services/checkInService';
 import { supabase } from '../lib/supabase';
+import ScrollReveal from '../components/ScrollReveal';
 
 const ROLE_ICONS = { terraformer: '⛰️', healer: '💚', ranger: '🌿', herbalist: '🌸', hydromancer: '💧' };
 const STATUS_ICON = { done: '✅', pending: '⏳', missed: '✗' };
@@ -49,30 +50,33 @@ export default function Dashboard({ onNavigate }) {
   }, {});
 
   return (
-    <div>
+    <div className="dashboard-container flex flex-col gap-6">
       {/* Squad HP Header */}
-      <div className="squad-hp-header">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-3)' }}>
-          <div>
-            <div style={{ fontWeight: 800, fontSize: 'var(--text-lg)' }}>{squad?.name || 'Your Squad'}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
-              {squad?.conservation_focus?.replace(/_/g, ' ')}
-              {squad?.cause_label && ` · ${squad.cause_label}`}
+      <ScrollReveal>
+        <div className="squad-hp-header" style={{ marginBottom: 0 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 'var(--space-3)' }}>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: 'var(--text-lg)' }}>{squad?.name || 'Your Squad'}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                {squad?.conservation_focus?.replace(/_/g, ' ')}
+                {squad?.cause_label && ` · ${squad.cause_label}`}
+              </div>
             </div>
+            <div className="hp-number" style={{ color: hpColor }}>{liveHP}/100</div>
           </div>
-          <div className="hp-number" style={{ color: hpColor }}>{liveHP}/100</div>
+          <div className="hp-bar-bg">
+            <div className="hp-bar-fill" style={{ width: `${liveHP}%`, background: `linear-gradient(90deg, ${hpColor}, ${hpColor}cc)`, transition: 'width 0.8s ease, background 0.5s' }} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'var(--space-2)', fontSize: 12, color: 'var(--text-muted)' }}>
+            <span>Squad HP</span>
+            <span>{liveHP > 60 ? '🟢 Healthy' : liveHP > 30 ? '🟡 Warning' : '🔴 Critical'}</span>
+          </div>
         </div>
-        <div className="hp-bar-bg">
-          <div className="hp-bar-fill" style={{ width: `${liveHP}%`, background: `linear-gradient(90deg, ${hpColor}, ${hpColor}cc)`, transition: 'width 0.8s ease, background 0.5s' }} />
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'var(--space-2)', fontSize: 12, color: 'var(--text-muted)' }}>
-          <span>Squad HP</span>
-          <span>{liveHP > 60 ? '🟢 Healthy' : liveHP > 30 ? '🟡 Warning' : '🔴 Critical'}</span>
-        </div>
-      </div>
+      </ScrollReveal>
 
       {/* Members Grid */}
-      <div className="card card-pad" style={{ marginBottom: 'var(--space-4)' }}>
+      <ScrollReveal>
+        <div className="card card-pad" style={{ marginBottom: 0 }}>
         <div className="section-label" style={{ marginBottom: 'var(--space-3)' }}>Squad Members</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           {members.length === 0 ? (
@@ -103,10 +107,12 @@ export default function Dashboard({ onNavigate }) {
           </div>
         )}
       </div>
+      </ScrollReveal>
 
       {/* Squad Quest */}
       {quest && (
-        <div className="card card-pad" style={{ marginBottom: 'var(--space-4)' }}>
+        <ScrollReveal>
+        <div className="card card-pad" style={{ marginBottom: 0 }}>
           <div className="section-label">Weekly Squad Quest</div>
           <div style={{ marginTop: 'var(--space-2)', marginBottom: 'var(--space-2)', fontSize: 13, color: 'var(--text-secondary)' }}>{quest.description}</div>
           <div className="hp-bar-bg" style={{ height: 8 }}>
@@ -117,10 +123,12 @@ export default function Dashboard({ onNavigate }) {
             {quest.completed && <span style={{ color: '#4CAF50', marginLeft: 8 }}>✅ Complete!</span>}
           </div>
         </div>
+        </ScrollReveal>
       )}
 
       {/* Impact Ledger */}
-      <div className="card card-pad" style={{ marginBottom: 'var(--space-4)' }}>
+      <ScrollReveal>
+      <div className="card card-pad" style={{ marginBottom: 0 }}>
         <div className="section-label">Squad Impact</div>
         <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-3)', flexWrap: 'wrap' }}>
           {[
@@ -137,8 +145,10 @@ export default function Dashboard({ onNavigate }) {
           ))}
         </div>
       </div>
+      </ScrollReveal>
 
       {/* CTA */}
+      <ScrollReveal>
       {!todayDone ? (
         <button className="btn btn-primary btn-full btn-lg" onClick={() => onNavigate('checkin')}>
           🌱 Log Today's Action
@@ -150,6 +160,7 @@ export default function Dashboard({ onNavigate }) {
           <div style={{ fontSize: 13, color: 'var(--text-muted)', marginTop: 4 }}>Come back tomorrow to keep your streak going.</div>
         </div>
       )}
+      </ScrollReveal>
     </div>
   );
 }

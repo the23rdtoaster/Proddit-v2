@@ -23,7 +23,7 @@ export default function Onboarding() {
   const { login, session, user, setUser, setOnboarded } = useApp();
   const [step, setStep] = useState(session ? 1 : 0);
   const [persona, setPersona] = useState('');
-  const [category, setCategory] = useState('');
+  const [categories, setCategories] = useState([]);
   const [role, setRole] = useState('');
   const [taskText, setTaskText] = useState('');
   const [showAI, setShowAI] = useState(false);
@@ -53,7 +53,7 @@ export default function Onboarding() {
     try {
       const updated = await upsertUser(session.user, {
         persona,
-        conservation_category: category,
+        conservation_category: categories.join(', '),
         role,
         task_description: taskText,
         hours_per_day: aiSchedule.hours,
@@ -71,7 +71,7 @@ export default function Onboarding() {
   const next = () => {
     if (step === 0) { handleGoogleLogin(); return; }
     if (step === 1 && !persona) return;
-    if (step === 2 && (!category || !role)) return;
+    if (step === 2 && (categories.length < 3 || !role)) return;
     if (step === 3) { handleFinish(); return; }
     setStep(s => s + 1);
   };
@@ -153,14 +153,20 @@ export default function Onboarding() {
         {step === 2 && (
           <div>
             <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 800, marginBottom: 'var(--space-2)' }}>Your Conservation Focus</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-4)' }}>Pick your primary cause — this shapes your squad matching.</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: 'var(--text-sm)', marginBottom: 'var(--space-4)' }}>Pick at least 3 primary causes (interests) — this shapes your squad matching.</p>
             <div className="grid-4" style={{ marginBottom: 'var(--space-6)' }}>
-              {CATEGORIES.map(c => (
-                <div key={c.key} className={`category-card ${category === c.key ? 'selected' : ''}`} onClick={() => setCategory(c.key)}>
-                  <div className="category-card-icon">{c.icon}</div>
-                  <div className="category-card-name">{c.label}</div>
-                </div>
-              ))}
+              {CATEGORIES.map(c => {
+                const isSelected = categories.includes(c.key);
+                return (
+                  <div key={c.key} className={`category-card ${isSelected ? 'selected' : ''}`} onClick={() => {
+                    if (isSelected) setCategories(categories.filter(x => x !== c.key));
+                    else setCategories([...categories, c.key]);
+                  }}>
+                    <div className="category-card-icon">{c.icon}</div>
+                    <div className="category-card-name">{c.label}</div>
+                  </div>
+                );
+              })}
             </div>
             <div className="section-label">Choose Your Role</div>
             <div className="grid-3" style={{ marginBottom: 'var(--space-6)', gridTemplateColumns: 'repeat(5, 1fr)', gap: 'var(--space-2)' }}>
@@ -174,7 +180,7 @@ export default function Onboarding() {
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
               <button className="btn btn-ghost" onClick={() => setStep(1)}>← Back</button>
-              <button className="btn btn-primary" style={{ flex: 1 }} onClick={next} disabled={!category || !role}>Continue →</button>
+              <button className="btn btn-primary" style={{ flex: 1 }} onClick={next} disabled={categories.length < 3 || !role}>Continue →</button>
             </div>
           </div>
         )}
