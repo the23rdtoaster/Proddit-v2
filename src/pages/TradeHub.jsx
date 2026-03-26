@@ -43,7 +43,7 @@ export default function TradeHub() {
     finally { setLoading(false); }
   };
 
-  useEffect(load, [user]);
+  useEffect(() => { load(); }, [user]);
 
   const handleRespond = async (tradeId, action) => {
     setActing(tradeId);
